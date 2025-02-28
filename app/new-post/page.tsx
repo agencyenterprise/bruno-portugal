@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { newPost } from './actions'
+import { UserFromDB, fetchUsers } from '../user/actions'
+import { useEffect, useState } from 'react'
 
 export default function NewPost() {
   const {
@@ -15,7 +17,17 @@ export default function NewPost() {
     content?: string
   }>()
 
+  const [users, setUsers] = useState<UserFromDB[] | null>(null);
+
   const router = useRouter()
+
+  useEffect(() => {
+    const fetchData =async () => {
+      const users = await fetchUsers();
+      setUsers(users);
+    };
+    fetchData();
+  }, [])
 
   return (
     <>
@@ -32,8 +44,9 @@ export default function NewPost() {
             Author
           </label>
           <select className="p-2 border border-gray-400 rounded-sm" id="author" {...register('authorId')}>
-            <option value={1}>Alice</option>
-            <option value={2}>Bob</option>
+            {users && users.map((user: UserFromDB) => (
+              <option value={user.id}>{user.name}</option>
+            ))}
           </select>
         </div>
         <div className="flex flex-col">
