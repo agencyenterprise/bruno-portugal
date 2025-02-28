@@ -1,9 +1,12 @@
 'use client'
 
+import { User } from "@prisma/client"
+
 interface Post {
   id: number
   title: string
-  content: string | null
+  content: string | null,
+  author: User
 }
 
 interface Props {
@@ -21,6 +24,7 @@ export default function HomePage({ posts }: Props) {
           <li className="border border-gray-500 rounded-md shadow-md p-4 bg-white w-96" key={post.id}>
             <h2 className="font-semibold">{post.title}</h2>
             <p>{post.content}</p>
+            <p>Author: {post.author.name}</p>
           </li>
         ))}
       </ul>
