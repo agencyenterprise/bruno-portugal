@@ -1,7 +1,6 @@
 'use server'
 
 import prisma from '@/prisma/client'
-import { NextRequest } from 'next/server'
 
 export interface UserFromDB {
     id: number
@@ -16,7 +15,6 @@ export const fetchUsers = async () => {
                 name: true
             }
         });
-        console.log(users);
         return users;
     } catch (error) {
         return [];
