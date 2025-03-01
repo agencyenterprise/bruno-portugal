@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { newPost } from '../app/new-post/actions'
-import { UserFromDB, fetchUsers } from '../app/api/user/route'
+import { newPost } from './actions'
+import { UserFromDB, fetchUsers } from '../api/user/route'
 import { useEffect, useState } from 'react'
 
 export default function NewPost({users}: {users: UserFromDB[]}) {

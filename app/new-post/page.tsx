@@ -1,5 +1,5 @@
 import { fetchUsers } from '../api/user/route'
-import NewPost from '../../components/NewPost'
+import NewPost from './NewPost'
 
 // This will fetch the users on the server side, at build time, before rendering.
 export default async function NewPostPage() {
