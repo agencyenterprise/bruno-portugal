@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { generateAIPost, newPost } from './actions'
-import { UserFromDB, fetchUsers } from '../user/actions'
+import { newPost } from '../app/new-post/actions'
+import { UserFromDB, fetchUsers } from '../app/api/user/route'
 import { useEffect, useState } from 'react'
 
 export default function NewPost({users}: {users: UserFromDB[]}) {
@@ -21,6 +21,7 @@ export default function NewPost({users}: {users: UserFromDB[]}) {
   // const [users, setUsers] = useState<UserFromDB[] | null>(null);
   const [gptKeywords, setGPTKeywords] = useState<string>('');
   const [error, setError] = useState<string | null>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter()
 
@@ -35,14 +36,31 @@ export default function NewPost({users}: {users: UserFromDB[]}) {
 //   }, []);
 
   async function generateChatGPTPost() {
+    setLoading(true);
+    if (gptKeywords.length === 0) {
+      setError("Keywords can't be empty.");
+      setLoading(false);
+      return;
+    }
     try {
-      const postCreated = await generateAIPost(gptKeywords);
-      if (postCreated) {
-        setValue('title', postCreated.title);
-        setValue('content', postCreated.content);
+      const response = await fetch("/api/ai-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keywords: gptKeywords.split(",").map((k) => k.trim()) }),
+      });
+  
+      if (!response.ok) throw new Error("Failed to fetch draft");
+  
+      const postGenerated = await response.json();
+      if (postGenerated) {
+        setValue('title', postGenerated.title);
+        setValue('content', postGenerated.content);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occured');
+    } catch (error) {
+      console.error("Error generating draft:", error);
+      setError(error instanceof Error ? error.message : 'Unknown error occured.')
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -62,7 +80,7 @@ export default function NewPost({users}: {users: UserFromDB[]}) {
           </label>
           <select className="p-2 border border-gray-400 rounded-sm" id="author" {...register('authorId')}>
             {users && users.map((user: UserFromDB) => (
-              <option value={user.id}>{user.name}</option>
+              <option key={user.id} value={user.id}>{user.name}</option>
             ))}
           </select>
         </div>
@@ -90,8 +108,9 @@ export default function NewPost({users}: {users: UserFromDB[]}) {
               placeholder="software development, AI, ChatGPT"
               onChange={(e) => setGPTKeywords(e.target.value)}
             />
-            <button onClick={generateChatGPTPost} type="button" className="border border-orange-600 rounded-sm p-2 bg-orange-400 text-white font-bold">
-              Generate
+            <button onClick={generateChatGPTPost} type="button" className="border border-orange-600 rounded-sm p-2 bg-orange-400 text-white font-bold"
+            disabled={loading}>
+            {loading ? 'Generating...' : 'Generate'}
             </button>
           </div>
           {error && <p className="text-red-500 font-bold">{error}</p>}
