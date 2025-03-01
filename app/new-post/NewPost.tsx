@@ -108,9 +108,8 @@ export default function NewPost({users}: {users: UserFromDB[]}) {
               placeholder="software development, AI, ChatGPT"
               onChange={(e) => setGPTKeywords(e.target.value)}
             />
-            <button onClick={generateChatGPTPost} type="button" className="border border-orange-600 rounded-sm p-2 bg-orange-400 text-white font-bold"
-            disabled={loading}>
-            {loading ? 'Generating...' : 'Generate'}
+            <button onClick={generateChatGPTPost} type="button" className="border border-orange-600 rounded-sm p-2 bg-orange-400 text-white font-bold" disabled={loading}>
+              {loading ? <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block"></span> : 'Generate'}
             </button>
           </div>
           {error && <p className="text-red-500 font-bold">{error}</p>}
