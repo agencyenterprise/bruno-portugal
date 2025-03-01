@@ -6,7 +6,9 @@ interface Post {
   id: number
   title: string
   content: string | null,
-  author: User
+  author: {
+    name: string | null
+  }
 }
 
 interface Props {
